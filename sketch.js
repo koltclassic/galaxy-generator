@@ -1,8 +1,8 @@
 let galaxySize = 8;
 let planets = [];
 let planetData;
-let speed;
-let dir;
+// let speed;
+// let dir;
 
 function setup() {
 	speed = 0;
@@ -15,6 +15,12 @@ function setup() {
 		let r = random(10, 50);
 		let id = i + 1;
 		let numMoons = Math.floor(random(1, 5));
+		for (var j = 0; j < planets.length; j++){
+			while (dist(x, y, planets[j].x, planets[j].y) < r){
+				x = random(100, width - 100);
+				y = random(100, height - 100);
+			}
+		}
 		let p = new Planet(x, y ,r, id, numMoons);
 
 		planets.push(p);
@@ -22,12 +28,12 @@ function setup() {
 
 	planetData = createElement('h2')
 	planetData.position(width - 200, 5);
+	console.log(planets);
 }
 
 function draw() {
 	background(50);
 	stroke(255);
-	// speed += dir * 0.05;
 
 	for (var i = 0; i < planets.length; i++){
 		planets[i].display();
@@ -52,7 +58,7 @@ class Planet {
 		this.x = x;
 		this.y = y;
 		this.r = r;
-		this.moons = this.generateMoons(x, y, numMoons, this.x, this.y);
+		this.moons = this.generateMoons(x, y, r, numMoons, this.x, this.y);
 		this.planetColor = [random(0, 256), random(0, 256), random(0, 256)];
 	}
 
@@ -64,12 +70,23 @@ class Planet {
 		}
 	};
 
-	generateMoons(x, y, num) {
+	generateMoons(x, y, r, num) {
 		var allMoons = [];
 		for (var i = 0; i < num; i++) {
 			//the moons of the planet should be at least the radius X and radius Y
 			//away from the planet
-			allMoons.push(new Moon((x - random(20, 40)), (y + random(20, 40)), 10, num));
+			var negPosX = Math.floor(random(30, 50) + 1);
+			var negPosY = Math.floor(random(30, 50) + 1);
+			negPosX *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
+			negPosY *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
+
+			var moonX = x - negPosX;
+			var moonY = y - negPosY;
+
+			moonX *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
+			moonY *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
+
+			allMoons.push(new Moon((moonX), (moonY), 10, num));
 		}
 
 		return allMoons;
@@ -98,9 +115,10 @@ class Moon {
 		}
 	};
 	display() {
-		speed += dir * 0.05;
+		//speed += dir * 0.05;
 		// this.x = this.x * cos(speed);
 		// this.y = this.y * sin(speed);
+
 		fill(this.moonColor);
 		ellipse(this.x, this.y, this.r, this.r);
 	}
